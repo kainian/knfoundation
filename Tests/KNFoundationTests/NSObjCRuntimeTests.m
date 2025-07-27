@@ -24,9 +24,9 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <NPFoundation/NPFoundation.h>
+#import <KNFoundation/KNFoundation.h>
 
-@protocol NPObjectProtocol <NSObject>
+@protocol KNObjectProtocol <NSObject>
 
 - (void)addMethod;
 
@@ -36,28 +36,28 @@
 
 @end
 
-@interface NPObject : NSObject
+@interface KNObject : NSObject
 
 @property (nonatomic, strong) NSString *npObject;
 
 @end
 
-@interface NPSuperObject : NPObject
+@interface KNSuperObject : KNObject
 
 @property (nonatomic, strong) NSString *superObject;
 
 @end
 
-@interface NPSubObject : NPSuperObject
+@interface KNSubObject : KNSuperObject
 
 @property (nonatomic, strong) NSString *subObject;
 
 @end
 
-@implementation NPObject
+@implementation KNObject
 
-- (void)overrideNPObjectMethod {
-    self.npObject = @"NPObjectMethod";
+- (void)overrideKNObjectMethod {
+    self.npObject = @"KNObjectMethod";
 }
 
 - (NSString *)overrideMethod:(NSString *)newValue {
@@ -70,10 +70,10 @@
 
 @end
 
-@implementation NPSuperObject
+@implementation KNSuperObject
 
 - (void)replaceMethod {
-    self.superObject = @"NPSuperObject";
+    self.superObject = @"KNSuperObject";
 }
 
 - (NSString *)replaceMethod:(NSString *)newValue {
@@ -84,16 +84,16 @@
     return x + y + z;
 }
 
-- (void)overrideNPSuperObject {
-    self.superObject = @"NPSuperObject";
+- (void)overrideKNSuperObject {
+    self.superObject = @"KNSuperObject";
 }
 
 @end
 
-@implementation NPSubObject
+@implementation KNSubObject
 
-- (void)overrideNPSubObject {
-    self.subObject = @"NPNPSubObject";
+- (void)overrideKNSubObject {
+    self.subObject = @"KNSubObject";
 }
 
 @end
@@ -115,13 +115,13 @@
 
 - (void)testOverrideMethod {
     __block NSString *value = nil;
-    NPSubObject *objc = [NPSubObject new];
-    NP_CLASS_OVERRIDEMETHOD_BEGIN(NPSubObject.class, @selector(overrideNPObjectMethod), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name)) {
+    KNSubObject *objc = [KNSubObject new];
+    KN_CLASS_OVERRIDEMETHOD_BEGIN(KNSubObject.class, @selector(overrideKNObjectMethod), NULL, KN_RETURN(void), KN_ARGS(id self, SEL name)) {
         value = @"TestValue";
-        NP_MAKE_OBJC_SUPER(self);
-        NP_METHOD_OVERRIDE(_np_sel);
+        KN_MAKE_OBJC_SUPER(self);
+        KN_METHOD_OVERRIDE(_np_sel);
     }
-    NP_CLASS_OVERRIDEMETHOD_PROCESS {
+    KN_CLASS_OVERRIDEMETHOD_PROCESS {
         NSLog(@"   class: %@", _np_cls);
         NSLog(@"     sel: %s", sel_getName(_np_sel));
         NSLog(@"   types: %s", _np_types);
@@ -129,17 +129,17 @@
         XCTAssertTrue(_np_types);
         XCTAssertTrue(_np_super_method);
     }
-    NP_CLASS_OVERRIDEMETHOD_END
-    [objc overrideNPObjectMethod];
+    KN_CLASS_OVERRIDEMETHOD_END
+    [objc overrideKNObjectMethod];
     XCTAssertEqual(@"TestValue", value);
-    XCTAssertEqual(@"NPObjectMethod", objc.npObject);
+    XCTAssertEqual(@"KNObjectMethod", objc.npObject);
     
-    NP_CLASS_OVERRIDEMETHOD_BEGIN(NPSubObject.class, @selector(overrideNPSuperObject), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name)) {
+    KN_CLASS_OVERRIDEMETHOD_BEGIN(KNSubObject.class, @selector(overrideKNSuperObject), NULL, KN_RETURN(void), KN_ARGS(id self, SEL name)) {
         value = @"TestValue:";
-        NP_MAKE_OBJC_SUPER(self);
-        NP_METHOD_OVERRIDE(_np_sel);
+        KN_MAKE_OBJC_SUPER(self);
+        KN_METHOD_OVERRIDE(_np_sel);
     }
-    NP_CLASS_OVERRIDEMETHOD_PROCESS {
+    KN_CLASS_OVERRIDEMETHOD_PROCESS {
         NSLog(@"   class: %@", _np_cls);
         NSLog(@"     sel: %s", sel_getName(_np_sel));
         NSLog(@"   types: %s", _np_types);
@@ -147,18 +147,18 @@
         XCTAssertTrue(_np_types);
         XCTAssertTrue(_np_super_method);
     }
-    NP_CLASS_OVERRIDEMETHOD_END
-    [objc overrideNPSuperObject];
+    KN_CLASS_OVERRIDEMETHOD_END
+    [objc overrideKNSuperObject];
     XCTAssertEqual(@"TestValue:", value);
-    XCTAssertEqual(@"NPSuperObject", objc.superObject);
+    XCTAssertEqual(@"KNSuperObject", objc.superObject);
     
-    NP_CLASS_OVERRIDEMETHOD_BEGIN(NPSubObject.class, @selector(overrideMethod:), NULL, NP_RETURN(NSString *), NP_ARGS(id self, SEL name, NSString *newValue)) {
-        NP_MAKE_OBJC_SUPER(self);
-        XCTAssertEqual(newValue, NP_METHOD_OVERRIDE(_np_sel, newValue));
+    KN_CLASS_OVERRIDEMETHOD_BEGIN(KNSubObject.class, @selector(overrideMethod:), NULL, KN_RETURN(NSString *), KN_ARGS(id self, SEL name, NSString *newValue)) {
+        KN_MAKE_OBJC_SUPER(self);
+        XCTAssertEqual(newValue, KN_METHOD_OVERRIDE(_np_sel, newValue));
         value = @"TestValue:NewValue";
         return @"ReturnValue";
     }
-    NP_CLASS_OVERRIDEMETHOD_PROCESS {
+    KN_CLASS_OVERRIDEMETHOD_PROCESS {
         NSLog(@"   class: %@", _np_cls);
         NSLog(@"     sel: %s", sel_getName(_np_sel));
         NSLog(@"   types: %s", _np_types);
@@ -166,17 +166,17 @@
         XCTAssertTrue(_np_types);
         XCTAssertTrue(_np_super_method);
     }
-    NP_CLASS_OVERRIDEMETHOD_END
+    KN_CLASS_OVERRIDEMETHOD_END
     XCTAssertEqual(@"ReturnValue", [objc overrideMethod:@"NewValue"]);
     XCTAssertEqual(@"TestValue:NewValue", value);
     
-    NP_CLASS_OVERRIDEMETHOD_BEGIN(NPSubObject.class, @selector(overrideMethodSum:y:z:), NULL, NP_RETURN(int64_t), NP_ARGS(id self, SEL name, int64_t x, int64_t y, int64_t z)) {
-        NP_MAKE_OBJC_SUPER(self);
-        XCTAssertEqual(x + y + z, NP_METHOD_OVERRIDE(_np_sel, x, y, z));
+    KN_CLASS_OVERRIDEMETHOD_BEGIN(KNSubObject.class, @selector(overrideMethodSum:y:z:), NULL, KN_RETURN(int64_t), KN_ARGS(id self, SEL name, int64_t x, int64_t y, int64_t z)) {
+        KN_MAKE_OBJC_SUPER(self);
+        XCTAssertEqual(x + y + z, KN_METHOD_OVERRIDE(_np_sel, x, y, z));
         value = @"TestValue:Sum";
         return x + y + z + 2;
     }
-    NP_CLASS_OVERRIDEMETHOD_PROCESS {
+    KN_CLASS_OVERRIDEMETHOD_PROCESS {
         NSLog(@"   class: %@", _np_cls);
         NSLog(@"     sel: %s", sel_getName(_np_sel));
         NSLog(@"   types: %s", _np_types);
@@ -184,16 +184,16 @@
         XCTAssertTrue(_np_types);
         XCTAssertTrue(_np_super_method);
     }
-    NP_CLASS_OVERRIDEMETHOD_END
+    KN_CLASS_OVERRIDEMETHOD_END
     
     XCTAssertEqual(20 + 21 + 22 + 2, [objc overrideMethodSum:20 y:21 z:22]);
     XCTAssertEqual(@"TestValue:Sum", value);
     
-    NP_CLASS_OVERRIDEMETHOD_BEGIN(NPSubObject.class, @selector(overrideNPSubObject), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name)) {
-        NP_MAKE_OBJC_SUPER(self);
-        NP_METHOD_OVERRIDE(_np_sel);
+    KN_CLASS_OVERRIDEMETHOD_BEGIN(KNSubObject.class, @selector(overrideKNSubObject), NULL, KN_RETURN(void), KN_ARGS(id self, SEL name)) {
+        KN_MAKE_OBJC_SUPER(self);
+        KN_METHOD_OVERRIDE(_np_sel);
     }
-    NP_CLASS_OVERRIDEMETHOD_PROCESS {
+    KN_CLASS_OVERRIDEMETHOD_PROCESS {
         NSLog(@"   class: %@", _np_cls);
         NSLog(@"     sel: %s", sel_getName(_np_sel));
         NSLog(@"   types: %s", _np_types);
@@ -201,19 +201,19 @@
         XCTAssertFalse(_np_types);
         XCTAssertFalse(_np_super_method);
     }
-    NP_CLASS_OVERRIDEMETHOD_END
-    [objc overrideNPSubObject];
-    XCTAssertEqual(@"NPNPSubObject", objc.subObject);
+    KN_CLASS_OVERRIDEMETHOD_END
+    [objc overrideKNSubObject];
+    XCTAssertEqual(@"KNSubObject", objc.subObject);
 }
 
 - (void)testReplaceMethod {
     __block NSString *value = nil;
-    NPSuperObject *obj = [NPSuperObject new];
-    NP_CLASS_REPLACEMETHOD_BEGIN(NPSuperObject.class, @selector(replaceMethod), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name)) {
+    KNSuperObject *obj = [KNSuperObject new];
+    KN_CLASS_REPLACEMETHOD_BEGIN(KNSuperObject.class, @selector(replaceMethod), NULL, KN_RETURN(void), KN_ARGS(id self, SEL name)) {
         value = @"TestValue";
-        NP_METHOD_OVERLOAD(self, _np_sel);
+        KN_METHOD_OVERLOAD(self, _np_sel);
     }
-    NP_CLASS_REPLACEMETHOD_PROCESS {
+    KN_CLASS_REPLACEMETHOD_PROCESS {
         NSLog(@"   class: %@", _np_cls);
         NSLog(@"     sel: %s", sel_getName(_np_sel));
         NSLog(@"   types: %s", _np_types);
@@ -221,17 +221,17 @@
         XCTAssertTrue(_np_types);
         XCTAssertTrue(_np_next_imp);
     }
-    NP_CLASS_REPLACEMETHOD_END
+    KN_CLASS_REPLACEMETHOD_END
     [obj replaceMethod];
     XCTAssertEqual(@"TestValue", value);
-    XCTAssertEqual(@"NPSuperObject", obj.superObject);
+    XCTAssertEqual(@"KNSuperObject", obj.superObject);
     
-    NP_CLASS_REPLACEMETHOD_BEGIN(NPSuperObject.class, @selector(replaceMethod:), NULL, NP_RETURN(NSString *), NP_ARGS(id self, SEL name, NSString *newValue)) {
+    KN_CLASS_REPLACEMETHOD_BEGIN(KNSuperObject.class, @selector(replaceMethod:), NULL, KN_RETURN(NSString *), KN_ARGS(id self, SEL name, NSString *newValue)) {
         value = @"TestValue:";
-        XCTAssertEqual(newValue, NP_METHOD_OVERLOAD(self, _np_sel, newValue));
+        XCTAssertEqual(newValue, KN_METHOD_OVERLOAD(self, _np_sel, newValue));
         return @"ReturnValue";
     }
-    NP_CLASS_REPLACEMETHOD_PROCESS {
+    KN_CLASS_REPLACEMETHOD_PROCESS {
         NSLog(@"   class: %@", _np_cls);
         NSLog(@"     sel: %s", sel_getName(_np_sel));
         NSLog(@"   types: %s", _np_types);
@@ -239,16 +239,16 @@
         XCTAssertTrue(_np_types);
         XCTAssertTrue(_np_next_imp);
     }
-    NP_CLASS_REPLACEMETHOD_END
+    KN_CLASS_REPLACEMETHOD_END
     XCTAssertEqual(@"ReturnValue", [obj replaceMethod:@"argValue"]);
     XCTAssertEqual(@"TestValue:", value);
     
-    NP_CLASS_REPLACEMETHOD_BEGIN(NPSuperObject.class, @selector(replaceMethodSum:y:z:), NULL, NP_RETURN(int64_t), NP_ARGS(id self, SEL name, int64_t x, int64_t y, int64_t z)) {
+    KN_CLASS_REPLACEMETHOD_BEGIN(KNSuperObject.class, @selector(replaceMethodSum:y:z:), NULL, KN_RETURN(int64_t), KN_ARGS(id self, SEL name, int64_t x, int64_t y, int64_t z)) {
         value = @"replaceMethodSum:y:z:";
-        XCTAssertEqual(x + y + z, NP_METHOD_OVERLOAD(self, _np_sel, x, y, z));
+        XCTAssertEqual(x + y + z, KN_METHOD_OVERLOAD(self, _np_sel, x, y, z));
         return x + y + z + 1;
     }
-    NP_CLASS_REPLACEMETHOD_PROCESS {
+    KN_CLASS_REPLACEMETHOD_PROCESS {
         NSLog(@"   class: %@", _np_cls);
         NSLog(@"     sel: %s", sel_getName(_np_sel));
         NSLog(@"   types: %s", _np_types);
@@ -256,14 +256,14 @@
         XCTAssertTrue(_np_types);
         XCTAssertTrue(_np_next_imp);
     }
-    NP_CLASS_REPLACEMETHOD_END
+    KN_CLASS_REPLACEMETHOD_END
     XCTAssertEqual(10 + 11 + 12 + 1, [obj replaceMethodSum:10 y:11 z:12]);
     XCTAssertEqual(@"replaceMethodSum:y:z:", value);
     
-    NP_CLASS_REPLACEMETHOD_BEGIN(NPSuperObject.class, @selector(setNpObject:), NULL, NP_RETURN(NSString *), NP_ARGS(id self, SEL name, NSString *newValue)) {
-        return NP_METHOD_OVERLOAD(self, _np_sel, newValue);
+    KN_CLASS_REPLACEMETHOD_BEGIN(KNSuperObject.class, @selector(setNpObject:), NULL, KN_RETURN(NSString *), KN_ARGS(id self, SEL name, NSString *newValue)) {
+        return KN_METHOD_OVERLOAD(self, _np_sel, newValue);
     }
-    NP_CLASS_REPLACEMETHOD_PROCESS {
+    KN_CLASS_REPLACEMETHOD_PROCESS {
         NSLog(@"   class: %@", _np_cls);
         NSLog(@"     sel: %s", sel_getName(_np_sel));
         NSLog(@"   types: %s", _np_types);
@@ -271,82 +271,82 @@
         XCTAssertFalse(_np_types);
         XCTAssertFalse(_np_next_imp);
     }
-    NP_CLASS_REPLACEMETHOD_END
+    KN_CLASS_REPLACEMETHOD_END
 }
 
 - (void)testAddMethod {
     __block NSString *value = nil;
-    NPObject *obj = [NPObject new];
-    NP_CLASS_ADDMETHOD_BEGIN(NPObject.class, @selector(addMethod), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name)) {
+    KNObject *obj = [KNObject new];
+    KN_CLASS_ADDMETHOD_BEGIN(KNObject.class, @selector(addMethod), NULL, KN_RETURN(void), KN_ARGS(id self, SEL name)) {
         value = @"TestValue";
     }
-    NP_CLASS_ADDMETHOD_PROCESS {
+    KN_CLASS_ADDMETHOD_PROCESS {
         NSLog(@"  class: %@", _np_cls);
         NSLog(@"    sel: %s", sel_getName(_np_sel));
         NSLog(@"  types: %s", _np_types);
         NSLog(@"success: %d", _np_success);
         XCTAssertTrue(_np_success);
     }
-    NP_CLASS_ADDMETHOD_END
+    KN_CLASS_ADDMETHOD_END
     XCTAssertNil(value);
-    [(id<NPObjectProtocol>)obj addMethod];
+    [(id<KNObjectProtocol>)obj addMethod];
     XCTAssertEqual(@"TestValue", value);
     
-    NP_CLASS_ADDMETHOD_BEGIN(NPObject.class, @selector(addMethod:), NULL, NP_RETURN(NSString *), NP_ARGS(id self, SEL name, NSString *newValue)) {
+    KN_CLASS_ADDMETHOD_BEGIN(KNObject.class, @selector(addMethod:), NULL, KN_RETURN(NSString *), KN_ARGS(id self, SEL name, NSString *newValue)) {
         value = newValue;
         return @"ReturnTestValue";
     }
-    NP_CLASS_ADDMETHOD_PROCESS {
+    KN_CLASS_ADDMETHOD_PROCESS {
         NSLog(@"  class: %@", _np_cls);
         NSLog(@"    sel: %s", sel_getName(_np_sel));
         NSLog(@"  types: %s", _np_types);
         NSLog(@"success: %d", _np_success);
         XCTAssertTrue(_np_success);
     }
-    NP_CLASS_ADDMETHOD_END
-    NSString *returnValue = [(id<NPObjectProtocol>)obj addMethod:@"argValue"];
+    KN_CLASS_ADDMETHOD_END
+    NSString *returnValue = [(id<KNObjectProtocol>)obj addMethod:@"argValue"];
     XCTAssertEqual(@"ReturnTestValue", returnValue);
     XCTAssertEqual(@"argValue", value);
     
-    NP_CLASS_ADDMETHOD_BEGIN(NPObject.class, @selector(addMethodSum:y:z:), NULL, NP_RETURN(int64_t), NP_ARGS(id self, SEL name, int64_t x, int64_t y, int64_t z)) {
+    KN_CLASS_ADDMETHOD_BEGIN(KNObject.class, @selector(addMethodSum:y:z:), NULL, KN_RETURN(int64_t), KN_ARGS(id self, SEL name, int64_t x, int64_t y, int64_t z)) {
         value = @"addMethodSum:y:z:";
         return x + y + z;
     }
-    NP_CLASS_ADDMETHOD_PROCESS {
+    KN_CLASS_ADDMETHOD_PROCESS {
         NSLog(@"  class: %@", _np_cls);
         NSLog(@"    sel: %s", sel_getName(_np_sel));
         NSLog(@"  types: %s", _np_types);
         NSLog(@"success: %d", _np_success);
         XCTAssertTrue(_np_success);
     }
-    NP_CLASS_ADDMETHOD_END
-    int64_t sum = [(id<NPObjectProtocol>)obj addMethodSum:1 y:2 z:3];
+    KN_CLASS_ADDMETHOD_END
+    int64_t sum = [(id<KNObjectProtocol>)obj addMethodSum:1 y:2 z:3];
     XCTAssertEqual(1 + 2 + 3, sum);
     XCTAssertEqual(@"addMethodSum:y:z:", value);
     
-    NP_CLASS_ADDMETHOD_BEGIN(NPObject.class, @selector(npObject), NULL, NP_RETURN(NSString *), NP_ARGS(id self, SEL name)) {
+    KN_CLASS_ADDMETHOD_BEGIN(KNObject.class, @selector(npObject), NULL, KN_RETURN(NSString *), KN_ARGS(id self, SEL name)) {
         return @"";
     }
-    NP_CLASS_ADDMETHOD_PROCESS {
+    KN_CLASS_ADDMETHOD_PROCESS {
         NSLog(@"  class: %@", _np_cls);
         NSLog(@"    sel: %s", sel_getName(_np_sel));
         NSLog(@"  types: %s", _np_types);
         NSLog(@"success: %d", _np_success);
         XCTAssertFalse(_np_success);
     }
-    NP_CLASS_ADDMETHOD_END
+    KN_CLASS_ADDMETHOD_END
     
-    NP_CLASS_ADDMETHOD_BEGIN(NPObject.class, @selector(setNpObject:), NULL, NP_RETURN(void), NP_ARGS(id self, SEL name, NSString *newValue)) {
+    KN_CLASS_ADDMETHOD_BEGIN(KNObject.class, @selector(setNpObject:), NULL, KN_RETURN(void), KN_ARGS(id self, SEL name, NSString *newValue)) {
         
     }
-    NP_CLASS_ADDMETHOD_PROCESS {
+    KN_CLASS_ADDMETHOD_PROCESS {
         NSLog(@"  class: %@", _np_cls);
         NSLog(@"    sel: %s", sel_getName(_np_sel));
         NSLog(@"  types: %s", _np_types);
         NSLog(@"success: %d", _np_success);
         XCTAssertFalse(_np_success);
     }
-    NP_CLASS_ADDMETHOD_END
+    KN_CLASS_ADDMETHOD_END
 }
 
 @end
